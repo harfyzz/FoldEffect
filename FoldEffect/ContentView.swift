@@ -9,10 +9,32 @@ import SwiftUI
 import RiveRuntime
 
 struct ContentView: View {
+    @State var images: [Int] = Array(1...22)
     @StateObject var paper = SharedRiveViewModel.shared.paper
     @State var isHidden: Bool = false
     var body: some View {
         VStack {
+            Text("Basic Fold effect exploration.")
+                .padding(.top, 32)
+                .padding(.horizontal, 32)
+                .font(.title)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.tertiary)
+            Spacer()
+            ScrollView(.horizontal){
+                HStack{
+                    ForEach(images, id: \.self){ image in
+                        Image("Img \(image)")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 330)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+            }
+            .scrollIndicators(.hidden)
+            Spacer()
+            /*
             paper.view()
             Text("Hide")
                 .foregroundStyle(.secondary)
@@ -23,8 +45,9 @@ struct ContentView: View {
                     isHidden.toggle()
                     paper.setInput( "isHidden?", value: isHidden)
                 }
+             */
         }
-        .padding()
+        
     }
 }
 
