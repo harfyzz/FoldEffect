@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		34C9BDE52D9D9DCC005FEBDB /* RiveRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 34C9BDE42D9D9DCC005FEBDB /* RiveRuntime */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		34C9BDD22D9D9D24005FEBDB /* FoldEffect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FoldEffect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34C9BDE52D9D9DCC005FEBDB /* RiveRuntime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = FoldEffect;
 			packageProductDependencies = (
+				34C9BDE42D9D9DCC005FEBDB /* RiveRuntime */,
 			);
 			productName = FoldEffect;
 			productReference = 34C9BDD22D9D9D24005FEBDB /* FoldEffect.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = 34C9BDC92D9D9D24005FEBDB;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				34C9BDE32D9D9DCC005FEBDB /* XCRemoteSwiftPackageReference "rive-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 34C9BDD32D9D9D24005FEBDB /* Products */;
 			projectDirPath = "";
@@ -324,6 +333,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		34C9BDE32D9D9DCC005FEBDB /* XCRemoteSwiftPackageReference "rive-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rive-app/rive-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.7.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		34C9BDE42D9D9DCC005FEBDB /* RiveRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 34C9BDE32D9D9DCC005FEBDB /* XCRemoteSwiftPackageReference "rive-ios" */;
+			productName = RiveRuntime;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 34C9BDCA2D9D9D24005FEBDB /* Project object */;
 }
