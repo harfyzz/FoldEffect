@@ -14,14 +14,51 @@ struct ContentView: View {
     @State var isHidden: Bool = false
     var body: some View {
         VStack {
-            Text("Basic Fold effect exploration.")
+          /*  Text("Basic Fold effect exploration.")
                 .padding(.top, 32)
                 .padding(.horizontal, 32)
                 .font(.title)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.tertiary)
-            Spacer()
-            ScrollView(.horizontal){
+            Spacer() */
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVGrid(columns:[GridItem(spacing:0), GridItem()], spacing: 16){
+                        ForEach(images, id: \.self){ image in
+                            VStack (alignment:.leading){
+                                Image("Img \(image)")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 150)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                   
+                                VStack(alignment:.leading,spacing:4){
+                                    Text("Jamie Suarez")
+                                    Text("5.4ft")
+                                }
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.leading,4)
+                                    .padding(.top,2)
+                            }.padding(6)
+                                .padding(.bottom, 2)
+                                .background(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 22))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 22)
+                                        .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
+                                }
+                                .scrollTransition(transition: { content, phase in
+                                    content
+                                        .blur(radius: phase.isIdentity ? 0 : 10)
+                                })
+                            
+                        }
+                    }
+                }.scrollIndicators(.hidden)
+            }
+         /*   ScrollView(.horizontal){
                 HStack{
                     ForEach(images, id: \.self){ image in
                         Image("Img \(image)")
@@ -32,7 +69,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .scrollIndicators(.hidden)
+            .scrollIndicators(.hidden) */
             Spacer()
             /*
             paper.view()
@@ -46,7 +83,8 @@ struct ContentView: View {
                     paper.setInput( "isHidden?", value: isHidden)
                 }
              */
-        }
+        }.background(Color("bg"))
+        .ignoresSafeArea(.all)
         
     }
 }
