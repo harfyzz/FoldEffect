@@ -16,6 +16,7 @@ struct ContentView: View {
     @State var isFullView: Bool = false
     @State var selectedFoldImage: FoldImage?
     var devicewidth: CGFloat = UIScreen.main.bounds.width - 32
+    @Namespace private var animation
     var body: some View {
         VStack {
             if !isFullView {
@@ -25,7 +26,7 @@ struct ContentView: View {
                             GridItem(spacing: 0),
                             GridItem(spacing: 0)
                         ], spacing: 16) {
-                            ForEach(foldImages) { foldImage in
+                            ForEach(foldImages.sorted(by: { $0.image > $1.image } )) { foldImage in
                                 VStack(alignment: .leading) {
                                     if foldImage.isFolded {
                                         ZStack {
@@ -88,7 +89,7 @@ struct ContentView: View {
                                 .onTapGesture {
                                     selectedFoldImage = foldImage
                                     paper = SharedRiveViewModel.shared.createPaperViewModel(imageNumber: foldImage.image) // Recreate with new image
-                                    withAnimation{
+                                    withAnimation(.spring(duration:0.3)){
                                         isFullView = true
                                     }
                                     
@@ -97,10 +98,14 @@ struct ContentView: View {
                         }
                     }
                     .onAppear {
-                        proxy.scrollTo(selectedFoldImage)
+                            if let imageId = selectedFoldImage?.id {
+                                proxy.scrollTo(imageId, anchor: .center)
+                            }
+                        
                     }
                     .scrollIndicators(.hidden)
                 }
+                .transition(.move(edge: .leading))
             } else {
                 VStack(spacing:16){
                     Spacer()
@@ -149,14 +154,14 @@ struct ContentView: View {
                     }
                     HStack{
                         HStack{
-                            Image(systemName: "xmark")
+                            Image(systemName: "chevron.backward")
                                 .font(.headline)
                                 .padding()
                         }
                         .background(Color("bg"))
                         .clipShape(Circle())
                         .onTapGesture {
-                            withAnimation{
+                            withAnimation(.spring(duration:0.3)){
                                 isFullView = false
                             }
                         }
@@ -176,7 +181,6 @@ struct ContentView: View {
                         withAnimation {
                             selectedFoldImage?.isFolded.toggle()
                         }
-                       
                         paper.setInput("isHidden?", value: selectedFoldImage?.isFolded ?? false)
                     }
                 }
@@ -184,6 +188,7 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 16)
                 .background(.white)
+                .transition(.move(edge: .trailing))
             }
         }
         .background(Color("bg"))
