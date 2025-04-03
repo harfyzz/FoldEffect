@@ -12,8 +12,7 @@ import SwiftData
 struct ContentView: View {
     @Query private var foldImages: [FoldImage]
     @Environment(\.modelContext) private var modelContext
-    @StateObject var paper = SharedRiveViewModel.shared.paper
-    @State var isHidden: Bool = false
+    @State private var paper: RiveViewModel = SharedRiveViewModel.shared.createPaperViewModel(imageNumber: 1) // Default to Img 1
     @State var isFullView: Bool = false
     @State var selectedFoldImage: FoldImage?
     var devicewidth: CGFloat = UIScreen.main.bounds.width - 32
@@ -88,6 +87,7 @@ struct ContentView: View {
                             }
                             .onTapGesture {
                                 selectedFoldImage = foldImage
+                                paper = SharedRiveViewModel.shared.createPaperViewModel(imageNumber: foldImage.image) // Recreate with new image
                                 withAnimation{
                                     isFullView = true
                                 }
@@ -111,14 +111,17 @@ struct ContentView: View {
                     }
                     paper.view()
                         .frame(height:devicewidth)
+                        .onAppear{
+                            paper.setInput("isHidden?", value: selectedFoldImage?.isFolded ?? false)
+                        }
                     Text("Hide")
                         .foregroundStyle(.secondary)
                         .padding()
                         .background(Color.gray.opacity(0.1))
                         .clipShape(RoundedRectangle(cornerRadius: 32))
                         .onTapGesture {
-                            isHidden.toggle()
-                            paper.setInput("isHidden?", value: isHidden)
+                            selectedFoldImage?.isFolded.toggle()
+                            paper.setInput("isHidden?", value: selectedFoldImage?.isFolded ?? false)
                         }
                     Spacer()
                 }
@@ -181,18 +184,24 @@ struct ContentView: View {
     ContentView()
 }
 
-class SharedRiveViewModel: ObservableObject {
+
+struct SharedRiveViewModel {
     static let shared = SharedRiveViewModel()
-    let paper: RiveViewModel
-    init() {
-        paper = RiveViewModel(
+    
+    // Private initializer to enforce singleton-like behavior
+    private init() {}
+    
+    // Function to create a RiveViewModel with a specific image number
+    func createPaperViewModel(imageNumber: Int) -> RiveViewModel {
+        RiveViewModel(
             fileName: "paperfold",
             stateMachineName: "State Machine 1",
             loadCdn: false,
             customLoader: { (asset: RiveFileAsset, data: Data, factory: RiveFactory) -> Bool in
-                // Load the image from Assets.xcassets
-                guard let uiImage = UIImage(named: "Img 2") else {
-                    fatalError("Failed to load 'IMG_5172-3764573' from Assets.")
+                // Load the image dynamically based on imageNumber
+                let imageName = "Img \(imageNumber)"
+                guard let uiImage = UIImage(named: imageName) else {
+                    fatalError("Failed to load '\(imageName)' from Assets.")
                 }
                 
                 // Convert the UIImage to Data (PNG format)
@@ -208,7 +217,4 @@ class SharedRiveViewModel: ObservableObject {
             }
         )
     }
-    
-    
 }
-
