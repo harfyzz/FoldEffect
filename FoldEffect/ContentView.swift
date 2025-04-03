@@ -19,117 +19,174 @@ struct ContentView: View {
     var body: some View {
         VStack {
             if !isFullView {
-                ScrollView {
-                    LazyVGrid(columns: [
-                        GridItem(spacing: 0),
-                        GridItem(spacing: 0)
-                    ], spacing: 16) {
-                        ForEach(foldImages) { foldImage in
-                            
-                            VStack(alignment: .leading) {
-                                if foldImage.isFolded {
-                                    ZStack {
-                                        
-                                        Image("Hashed bg")
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVGrid(columns: [
+                            GridItem(spacing: 0),
+                            GridItem(spacing: 0)
+                        ], spacing: 16) {
+                            ForEach(foldImages) { foldImage in
+                                VStack(alignment: .leading) {
+                                    if foldImage.isFolded {
+                                        ZStack {
+                                            
+                                            Image("Hashed bg")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 150)
+                                                .background(Color("bg"))
+                                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                            VStack{
+                                                Image("folded.white")
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fit)
+                                                    .frame(width: 80)
+                                                Text("Folded")
+                                                    .font(.footnote)
+                                                    .fontWeight(.medium)
+                                                    .foregroundStyle(.tertiary)
+                                                    .padding(.horizontal, 10)
+                                                    .padding(.vertical, 4)
+                                                    .background(.white)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 64))
+                                                    .overlay {
+                                                        RoundedRectangle(cornerRadius: 64)
+                                                            .stroke(style: StrokeStyle(lineWidth: 1))
+                                                            .opacity(0.1)
+                                                    }
+                                            }
+                                        }
+                                    } else {
+                                        Image("Img \(foldImage.image)")
                                             .resizable()
                                             .aspectRatio(contentMode: .fit)
                                             .frame(width: 150)
-                                            .background(Color("bg"))
                                             .clipShape(RoundedRectangle(cornerRadius: 16))
-                                        VStack{
-                                            Image("folded.white")
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width: 80)
-                                            Text("Folded")
-                                                .font(.headline)
-                                                .fontWeight(.medium)
-                                                .foregroundStyle(.tertiary)
-                                                .padding(.horizontal, 10)
-                                                .padding(.vertical, 4)
-                                                .background(.white)
-                                                .clipShape(RoundedRectangle(cornerRadius: 64))
-                                                .overlay {
-                                                    RoundedRectangle(cornerRadius: 64)
-                                                        .stroke(style: StrokeStyle(lineWidth: 1))
-                                                        .opacity(0.1)
-                                                }
-                                        }
                                     }
-                                } else {
-                                    Image("Img \(foldImage.image)")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(width: 150)
-                                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(foldImage.name)
+                                        Text(String(format: "%.1f ft", foldImage.height))
+                                    }
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.leading, 4)
+                                    .padding(.top, 2)
                                 }
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(foldImage.name)
-                                    Text(String(format: "%.1f ft", foldImage.height))
+                                .padding(6)
+                                .padding(.bottom, 2)
+                                .background(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 22))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 22)
+                                        .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
                                 }
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundStyle(.secondary)
-                                .padding(.leading, 4)
-                                .padding(.top, 2)
-                            }
-                            .padding(6)
-                            .padding(.bottom, 2)
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 22))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 22)
-                                    .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
-                            }
-                            .scrollTransition { content, phase in
-                                content
-                                    .blur(radius: phase.isIdentity ? 0 : 10)
-                            }
-                            .onTapGesture {
-                                selectedFoldImage = foldImage
-                                paper = SharedRiveViewModel.shared.createPaperViewModel(imageNumber: foldImage.image) // Recreate with new image
-                                withAnimation{
-                                    isFullView = true
+                                .scrollTransition { content, phase in
+                                    content
+                                        .blur(radius: phase.isIdentity ? 0 : 10)
                                 }
-                                
+                                .onTapGesture {
+                                    selectedFoldImage = foldImage
+                                    paper = SharedRiveViewModel.shared.createPaperViewModel(imageNumber: foldImage.image) // Recreate with new image
+                                    withAnimation{
+                                        isFullView = true
+                                    }
+                                    
+                                }
                             }
                         }
                     }
+                    .onAppear {
+                        proxy.scrollTo(selectedFoldImage)
+                    }
+                    .scrollIndicators(.hidden)
                 }
-                .scrollIndicators(.hidden)
             } else {
-                VStack(spacing:24){
+                VStack(spacing:16){
                     Spacer()
+                    ZStack {
+                        Image("Hashed bg")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: devicewidth)
+                        
+                        paper.view()
+                            .onAppear{
+                                paper.setInput("isHidden?", value: selectedFoldImage?.isFolded ?? false)
+                            }
+                    }
+                    .frame(height:devicewidth)
+                    .background(Color("bg"))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    HStack(alignment:.top){
+                        HStack {
+                            VStack {
+                                Rectangle()
+                                    .frame(width:1, height: 16)
+                                    .foregroundStyle(.tertiary.opacity(0.5))
+                                Text(String(format: "%.1f ft", selectedFoldImage?.height ?? 0))
+                                    .font(.system(size: 12, weight: .medium, design: .monospaced) )
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.top, 4)
+                                Rectangle()
+                                    .frame(width:1)
+                                    .foregroundStyle(.tertiary.opacity(0.5))
+                            }
+                            Spacer()
+                        }
+                        .padding(.leading, 8)
+                        .frame(width: devicewidth/2)
+                        VStack(alignment:.leading, spacing: 8){
+                            Text(selectedFoldImage?.name.capitalized ?? "")
+                                .font(.title2)
+                                .foregroundStyle(.primary)
+                            Text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.")
+                                .multilineTextAlignment(.leading)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    HStack{
+                        HStack{
+                            Image(systemName: "xmark")
+                                .font(.headline)
+                                .padding()
+                        }
+                        .background(Color("bg"))
+                        .clipShape(Circle())
+                        .onTapGesture {
+                            withAnimation{
+                                isFullView = false
+                            }
+                        }
                     HStack{
                         Spacer()
-                        Image(systemName: "xmark")
-                            .font(.headline)
+                        Text(selectedFoldImage?.isFolded ?? false ? "Show" : "Hide")
+                            .foregroundStyle(.gray)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .transition(.blurReplace())
+                        Spacer()
                     }
-                    .background(Color("bg"))
+                    .padding()
+                    .background(.primary)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                     .onTapGesture {
-                        isFullView = false
-                    }
-                    paper.view()
-                        .frame(height:devicewidth)
-                        .onAppear{
-                            paper.setInput("isHidden?", value: selectedFoldImage?.isFolded ?? false)
-                        }
-                    Text("Hide")
-                        .foregroundStyle(.secondary)
-                        .padding()
-                        .background(Color.gray.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 32))
-                        .onTapGesture {
+                        withAnimation {
                             selectedFoldImage?.isFolded.toggle()
-                            paper.setInput("isHidden?", value: selectedFoldImage?.isFolded ?? false)
                         }
-                    Spacer()
+                       
+                        paper.setInput("isHidden?", value: selectedFoldImage?.isFolded ?? false)
+                    }
+                }
+                    .padding(.horizontal, 8)
                 }
                 .padding(.horizontal, 16)
+                .background(.white)
             }
         }
         .background(Color("bg"))
-        .ignoresSafeArea(.all)
         .preferredColorScheme(.light)
         .onAppear {
             initializeFoldImages()
