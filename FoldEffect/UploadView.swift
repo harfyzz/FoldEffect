@@ -17,6 +17,8 @@ struct UploadView: View {
     var devicewidth: CGFloat = UIScreen.main.bounds.width - 32
     @State private var refreshTrigger = false
     @State var isFolded: Bool = false
+    @State var foldType: Double = 1
+    @State var foldName: String = "Fold"
     init() {
         // Initialize with default image
         _paper = State(initialValue: UploadRiveViewModel.upload.createPaperViewModel(with: UIImage(named: "Img 2")!))
@@ -24,19 +26,6 @@ struct UploadView: View {
     var body: some View {
         VStack {
             VStack(spacing:16){
-                HStack{
-                    Text("Fold")
-                        .padding()
-                    .onTapGesture {
-                        paper?.setInput("fold type", value: Double(1))
-                    }
-                    Text("Squeeze")
-                        .padding()
-                .onTapGesture {
-                    paper?.setInput("fold type", value: Double(2))
-                }
-                }.background(Color("bg"))
-                    .clipShape(RoundedRectangle(cornerRadius: 32))
                 ZStack {
                     Image("Hashed bg")
                         .resizable()
@@ -46,8 +35,11 @@ struct UploadView: View {
                     paper?.view()
                         .onAppear {
                             paper?.setInput("isHidden?", value: isFolded)
-                            paper?.setInput("fold type", value: Double(1))
+                            paper?.setInput("fold type", value: foldType)
                         }
+                        .onChange(of: foldType, { oldValue, newValue in
+                            paper?.setInput("fold type", value: foldType)
+                        })
                 }
                 .frame(height:devicewidth)
                 .background(Color("bg"))
@@ -72,9 +64,38 @@ struct UploadView: View {
                     .padding(.leading, 8)
                     .frame(width: devicewidth/2)
                     VStack(alignment:.leading, spacing: 8){
-                        Text("Jamie Alexander")
-                            .font(.title2)
+                        HStack {
+                            Text(foldName)
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundStyle(.secondary)
+                                .padding(6)
+                                .background(Color("bg"))
+                                .clipShape(Circle())
+                        }.font(.title2)
+                            .fontWeight(.medium)
                             .foregroundStyle(.primary)
+                            .contentTransition(.numericText())
+                            .onTapGesture {
+                                withAnimation(.spring(duration:0.3)) {
+                                    switch foldType {
+                                    case 1:
+                                        foldType = 2
+                                        foldName = "Squeeze"
+                                    case 2:
+                                        foldType = 3
+                                        foldName = "Wrap"
+                                    case 3:
+                                        foldType = 1
+                                        foldName = "Fold"
+                                    default:
+                                        foldType = 1
+                                        foldName = "Fold"
+                                        paper?.setInput("fold type", value: foldType)
+                                    }
+                                }
+                            }
                         Text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.")
                             .multilineTextAlignment(.leading)
                             .font(.caption)
