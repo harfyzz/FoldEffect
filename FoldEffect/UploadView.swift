@@ -24,7 +24,19 @@ struct UploadView: View {
     var body: some View {
         VStack {
             VStack(spacing:16){
-                Spacer()
+                HStack{
+                    Text("Fold")
+                        .padding()
+                    .onTapGesture {
+                        paper?.setInput("fold type", value: Double(1))
+                    }
+                    Text("Squeeze")
+                        .padding()
+                .onTapGesture {
+                    paper?.setInput("fold type", value: Double(2))
+                }
+                }.background(Color("bg"))
+                    .clipShape(RoundedRectangle(cornerRadius: 32))
                 ZStack {
                     Image("Hashed bg")
                         .resizable()
@@ -34,6 +46,7 @@ struct UploadView: View {
                     paper?.view()
                         .onAppear {
                             paper?.setInput("isHidden?", value: isFolded)
+                            paper?.setInput("fold type", value: Double(1))
                         }
                 }
                 .frame(height:devicewidth)
