@@ -24,7 +24,7 @@ struct FoldEffectApp: App {
     }()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            UploadView()
         }.modelContainer(sharedModelContainer)
     }
 }

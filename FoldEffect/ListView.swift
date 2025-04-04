@@ -9,7 +9,7 @@ import SwiftUI
 import RiveRuntime
 import SwiftData
 
-struct ContentView: View {
+struct ListView: View {
     @Query private var foldImages: [FoldImage]
     @Environment(\.modelContext) private var modelContext
     @State private var paper: RiveViewModel = SharedRiveViewModel.shared.createPaperViewModel(imageNumber: 1) // Default to Img 1
@@ -243,7 +243,7 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ListView()
 }
 
 
